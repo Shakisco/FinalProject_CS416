@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class="display-4">Your favorites</h1>
+    <div class="mt-3">
+        <a href="{% url 'view_events' %}" class="btn btn-outline-light">
+            ← Back to search
+        </a>
+    </div>
+{% endblock %}
+
+{% block results_title %}
+    {% if favorites %}
+        {{ favorites|length }} favorite events
+    {% else %}
+        No favorites yet
+    {% endif %}
+{% endblock %}
+
+{% block results %}
+    {% if favorites %}
+        {% for fav in favorites %}
+            <div class="card shadow-sm mb-3 border-1 mt-2">
+                <div class="row g-0">
+                    <div class="col-md-3">
+                        {% if fav.image %}
+                            <img src="{{ fav.image }}" class="img-fluid rounded-start w-100" alt="{{ fav.name }}">
+                        {% else %}
+                            <div class="bg-light h-100 w-100 d-flex align-items-center justify-content-center text-muted">
+                                No image
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-body">
+                            <h3 class="card-title mb-2 fw-semibold">{{ fav.name }}</h3>
+                            <h5 class="mb-1">
+                                <i class="bi bi-geo-alt-fill"></i>
+                                <strong>{{ fav.venue }}</strong>
+                            </h5>
+                            <p class="mb-0">{{ fav.street }}</p>
+                            <p class="mb-0">
+                                {{ fav.city }}
+                                {% if fav.state %},
+                                    {{ fav.state }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="h-100 d-flex flex-column justify-content-start align-items-end p-3">
+                            <div class="fw-semibold text-primary-emphasis">{{ fav.event_date }}</div>
+                            <div class="text-primary-emphasis mb-2">{{ fav.event_time }}</div>
+
+                            {% if fav.url %}
+                                <a href="{{ fav.url }}" target="_blank" class="btn btn-outline-primary btn-sm mb-2">
+                                    <i class="bi bi-ticket-detailed"></i> Tickets
+                                </a>
+                            {% endif %}
+
+                            <form method="post" action="{% url 'delete_favorite' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="fav_id" value="{{ fav.id }}">
+                                <button class="btn btn-outline-danger btn-sm" type="submit">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}
